@@ -15,30 +15,215 @@ The executive dashboard delivers real-time visibility across 80K+ transactions, 
 - **Average CAC**: $2,480
 - **YoY Revenue Growth**: +0.20
 
-### Dashboard Visuals Included
+### Dashboard Visuals & Descriptions
 
-#### 1. Revenue Trend Analysis
-**Multi-month revenue waterfall** showing seasonal patterns and growth trajectory across product lines.
+#### 1. Filter Panel (Left Sidebar)
+**Interactive Filter Controls** enabling drill-down analysis:
+```
+FILTERS
+├── Date          [All ▼]           - Temporal filtering
+├── Segment       [All ▼]           - Customer segment (Enterprise/SMB/Mid-Market)
+├── ProductCategory [All ▼]         - Product line filtering
+└── Country       [All ▼]           - Geographic analysis
+```
+**Use Case**: Recruiters can instantly filter to any business segment and see corresponding metric updates across all visuals.
 
-#### 2. Product Profitability Breakdown
-**Stacked bar chart** displaying revenue contribution by product category with performance ranking.
+---
 
-#### 3. CAC Efficiency Scatter Plot (4-Quadrant Analysis)
-**Interactive scatter visualization** mapping:
-- **X-axis**: Average Customer Acquisition Cost ($)
-- **Y-axis**: YoY Revenue Growth (%)
-- **Color-coded by Channel**: Direct Sales (blue), Email (purple), Paid Search (blue), Social Ads (orange/red)
+#### 2. KPI Cards (Top Row - Left to Right)
 
-**Business Insight**: Identifies high-efficiency channels (low CAC, high growth) vs. deprioritization candidates.
+**Card 1: Total Net Revenue**
+```
+┌─────────────────────────┐
+│   Total Net Revenue     │
+│      25.20M             │
+│                         │
+│ YoY Revenue Growth 0.20 │
+└─────────────────────────┘
+```
+- **Value Shown**: $25.20M YTD
+- **Supporting Metric**: YoY growth rate (0.20)
+- **Business Insight**: Absolute revenue trending positive with growth trajectory
 
-#### 4. Revenue Growth by Product
-**Waterfall chart** decomposing period-over-period variance by product category.
+**Card 2: Gross Margin %**
+```
+┌─────────────────────────┐
+│    Gross Margin %       │
+│   ╭─────── ╮            │
+│   │ 55.40% │            │
+│   ╰─────── ╯            │
+│   (Gauge Visual)        │
+└─────────────────────────┘
+```
+- **Gauge Chart**: Semi-circular progress indicator at 55.40%
+- **Target Benchmark**: Typically 50-60% healthy range
+- **Business Insight**: Strong profitability with room for optimization
 
-#### 5. Interactive Filters
-- **Date Range**: All time / Month / Quarter selection
-- **Segment**: All / Enterprise / SMB / Mid-Market
-- **Product Category**: All / Lending / FX / Payments / etc.
-- **Country**: Geographic-level filtering
+**Card 3: Active Customers**
+```
+┌─────────────────────────┐
+│   Active Customers      │
+│         2K              │
+│                         │
+│   (Current Period)      │
+└─────────────────────────┘
+```
+- **Count**: 2,000 active users
+- **Segmentation Ready**: Can drill by Segment filter
+- **Retention Signal**: Month-over-month cohort tracking
+
+**Card 4: Avg CAC**
+```
+┌─────────────────────────┐
+│      Avg CAC            │
+│     2.48K               │
+│     ($2,480)            │
+│                         │
+└─────────────────────────┘
+```
+- **Unit Economics**: $2,480 per customer acquired
+- **Channel Attribution**: Varies by acquisition source
+- **Optimization Signal**: Drives budget allocation decisions
+
+---
+
+#### 3. Product Profitability Chart (Right Side)
+```
+PRODUCT PROFITABILITY
+═══════════════════════════════════════════════════════════
+
+8.0M  ╭─╮
+      │ │
+3.5M  │ │╭─╮
+      │ ││ │
+2.8M  │ ││ │╭─╮
+      │ ││ ││ │
+2.7M  │ ││ ││ │╭─╮
+      │ ││ ││ ││ │╭─╮  ╭─╮  ╭─╮  ╭─╮
+2.5M  │ ││ ││ ││ ││ │╭─╮│ │╭─╮│ │╭─╮│ │
+      │ ││ ││ ││ ││ ││ ││ ││ ││ ││ ││ │
+1.3M  │ ││ ││ ││ ││ ││ ││ ││ ││ ││ ││ │
+      │ ││ ││ ││ ││ ││ ││ ││ ││ ││ ││ │
+      └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─
+        L  P  A  D  P  C  P  I
+```
+- **Bar Chart Type**: Vertical bar chart with gradient coloring (blue-to-orange)
+- **Products Ranked** (L→R): Lending, Prepaid, Analytics, Digital, Payments, Commerce, Payroll, Insurance
+- **Revenue Distribution**: Lending dominates at 8.0M, trailing down to 1.3M (Insurance)
+- **Business Insight**: Clear winner (Lending platform) with opportunity to scale secondary products
+- **Color Encoding**: Orange = high priority, Blue = growth opportunity
+
+---
+
+#### 4. Revenue Trend (Waterfall Analysis)
+```
+TOTAL NET REVENUE TREND
+═════════════════════════════════════════════════════════════
+
+3.2M  ┌─┐     ┌─┐
+      │ │     │ │     ┌─┐     ┌─┐
+2.7M  │ │┌─┐  │ │  ┌──┼─┼──┐  │ │
+      │ ││ │  │ │  │  │ │  │  │ │
+2.3M  │ ││ │  │ │  │  │ │  │──┼─┼───┐
+      │ ││ │  │ │  │  │ │  │  │ │   │
+2.0M  │ ││ │  │ │  │  │ │  │  │ │   │
+      │ ││ │  │ │  │  │ │  │  │ │   │
+      └─┴─┘  └─┘  └──┴─┴──┘  └─┴─┴───┘
+       Dec  Nov  Oct  Sep  Jun  May  Jul  Aug  Mar  Jan  Feb
+```
+- **Chart Type**: Multi-line/area chart showing revenue progression
+- **Time Period**: 12-month view (Dec through Feb)
+- **Trend Pattern**: 
+  - Peak: ~3.2M (December - holiday season)
+  - Valley: ~0.6M-2.0M (Summer months - seasonal dips)
+  - Recovery: ~2.3M (Q1 ramp up)
+- **Business Insight**: Clear seasonality with Q4 concentration; fintech pattern typical
+- **Opportunity**: Identify off-season growth initiatives
+
+---
+
+#### 5. Revenue Growth Product Wise (Waterfall Variance)
+```
+REVENUE GROWTH PRODUCT WISE
+════════════════════════════════════════════════════════════
+
+1.1M ┌────────┐
+ 1M  │        │     ┌────┐
+800K │        │  ┌──┼────┼──┐
+     │        │  │  │    │  │     ┌──┐
+600K │        │  │  │    │  │  ┌──┼──┼──┐
+     │        │  │  │    │  │  │  │  │  │
+400K │ BLUE   │  │  │ -20│  │-31│  │551 -100│
+     │        │  │  │    │  │  │  │  │  │
+200K │        │  │  │    │  │  │  │  │  │
+     │        │  │  │    │  │  │  │  │  │
+  0K └────────┘  └──┴────┴──┘  └──┴──┴──┘
+                 Lending  Prepaid  Analytics  Digital  Payments  Commerce  Etc.
+```
+- **Chart Type**: Waterfall visualization (bridge chart)
+- **Positive Contributions** (Blue bars):
+  - **Lending**: +$1.1M (largest driver - 65% of growth explained)
+  - **Prepaid**: +$600K
+  - **Commerce**: +$551K
+- **Negative Contributions** (Red bars):
+  - **Analytics**: -$310K (sunset/decline)
+  - **Digital**: -$100K (legacy product)
+- **Net Result**: +$1.74M period-over-period growth
+- **Business Insight**: SMB Lending platform is the breakout success story
+
+---
+
+#### 6. CAC Efficiency Scatter Plot (4-Quadrant Analysis)
+```
+CAC EFFICIENCY SCATTER PLOT
+════════════════════════════════════════════════════════════
+
+Y-Axis: YoY Revenue Growth %
+│
+0.22 │                          🔵 (Paid Search, High Growth)
+     │         🟣 (Email)
+0.21 │        🟣   🟣
+     │     🟣
+0.20 │         🟣
+     │    🟠 (Social Ads - High CAC)
+0.19 │
+     │
+0.00 ├─────── ────── ────── ────────────► X-Axis: Average CAC ($)
+     0        500    1000    1500+
+
+QUADRANT ANALYSIS:
+┌────────────────────┬──────────────────────────┐
+│ HIGH GROWTH        │ HIGH GROWTH              │
+│ LOW CAC ✅         │ HIGH CAC ⚠️              │
+│ (Scale Aggressively) (Optimize Landing)      │
+├────────────────────┼──────────────────────────┤
+│ LOW GROWTH         │ LOW GROWTH               │
+│ LOW CAC 📊         │ HIGH CAC ❌              │
+│ (Monitor)          │ (REDUCE by 10%)          │
+└────────────────────┴──────────────────────────┘
+```
+- **Chart Type**: Scatter plot with color-coded channels
+  - 🔵 **Blue Dots**: Paid Search channel (high efficiency)
+  - 🟣 **Purple Dots**: Email channel (optimal CAC ~$200-400, strong growth)
+  - 🟠 **Orange Dot**: Social Ads (high CAC ~$1000+, lower growth)
+  
+- **Key Finding**: Email channel outperforms on efficiency vs. growth tradeoff
+  
+- **Recruitment Decision Made**:
+  - ✅ Increase Email marketing budget by 10%
+  - ✅ Scale Paid Search (proven channel)
+  - ❌ Reduce Social Ads spend by 10% (poor CAC efficiency)
+  
+- **Business Impact**: Budget reallocation strategy resulting in 15% improved CAC
+
+---
+
+#### 7. Page Navigation
+- **Current View**: Page 1 of 1
+- **Additional Pages Available** (via bottom tabs):
+  - Revenue at Risk (secondary analysis page)
+  - Cohort Retention Heatmap (not shown in this view)
+  - Customer Segmentation Deep-Dive
 
 ---
 
