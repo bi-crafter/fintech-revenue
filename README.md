@@ -359,3 +359,5 @@ For questions about the project methodology or technical implementation, please 
 ---
 
 **Built with ❤️ by a Top 1% Data Analyst | Portfolio Piece for Recruiter Review**
+#   f i n t e c h - r e v e n u e  
+ 
