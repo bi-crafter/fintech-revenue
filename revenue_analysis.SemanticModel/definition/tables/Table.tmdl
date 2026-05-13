@@ -1,0 +1,130 @@
+table Table
+	lineageTag: d7e50cc7-67ee-413b-b1d3-b7302695add1
+
+	measure 'Total Net Revenue' = SUM('FactRevenue - FactRevenue csv'[NetRevenue])
+		lineageTag: b6e51908-acb8-48e1-847f-c8902d58bd9c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total CAC' = SUM('FactRevenue - FactRevenue csv'[CostPerAcquisition])
+		lineageTag: 55186bd7-8f01-458f-ba1b-0f0d6ca8c1ec
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average CAC' = DIVIDE([Total CAC], [Active Customers], 0)
+		lineageTag: ecbd0e7d-6455-4cb5-8ea6-0c98a9aa236e
+
+	measure 'Active Customers' = DISTINCTCOUNT('FactRevenue - FactRevenue csv'[CustomerKey])
+		formatString: 0
+		lineageTag: 196da7f4-f580-48a3-8244-4c11403e9b83
+
+	measure 'Marketing ROI' = DIVIDE([Total Net Revenue] - [Total CAC], [Total CAC], 0)
+		lineageTag: 4914046c-ea14-4654-ab67-a5d49d3aea47
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ARPU = DIVIDE([Total Net Revenue], [Active Customers], 0)
+		lineageTag: 3637d667-f089-4411-b300-418d5cd8cb61
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'YoY Revenue Growth' =
+			
+			VAR CurrentYear = [Total Net Revenue]
+			VAR PriorYear = CALCULATE([Total Net Revenue], SAMEPERIODLASTYEAR('DimDate - DimDate csv'[FullDate]))
+			RETURN DIVIDE(CurrentYear - PriorYear, PriorYear, 0)
+		lineageTag: 383da43f-6931-4703-9aae-f852d37f5fa7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue R12M' =
+			
+			CALCULATE(
+			    [Total Net Revenue],
+			    DATESINPERIOD('DimDate - DimDate csv'[FullDate], MAX('DimDate - DimDate csv'[FullDate]), -12, MONTH)
+			)
+		lineageTag: 980e4170-cccb-407c-84a0-b38248b143a1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Customer Growth %' =
+			
+			VAR CurrentCustomers = [Active Customers]
+			VAR PriorCustomers = CALCULATE([Active Customers], DATEADD('DimDate - DimDate csv'[FullDate], -1, MONTH))
+			RETURN DIVIDE(CurrentCustomers - PriorCustomers, PriorCustomers, 0)
+		lineageTag: f7eee5ae-86c4-4cab-8cc0-31de963ccd90
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'New User Revenue %' =
+			
+			VAR NewRev = CALCULATE([Total Net Revenue], 'FactRevenue - FactRevenue csv'[IsFirstTransaction] = 1)
+			RETURN DIVIDE(NewRev, [Total Net Revenue], 0)
+		lineageTag: 37853b58-2231-4d22-a6fb-8e2475365a0d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Monthly Churn Rate' =
+			
+			VAR CustomersLastMonth = CALCULATE([Active Customers], PREVIOUSMONTH('DimDate - DimDate csv'[FullDate]))
+			VAR LostCustomers = CustomersLastMonth - [Active Customers]
+			RETURN DIVIDE(MAX(LostCustomers, 0), CustomersLastMonth, 0)
+		lineageTag: db67b23d-7ae8-454e-b45f-70654015cb95
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Cohort Retention %' = ```
+			
+			VAR InitialCohortSize = 
+			    CALCULATE(
+			        [Active Customers], 
+			        ALLEXCEPT('DimCustomer - DimCustomer csv', 'DimCustomer - DimCustomer csv'[CustomerCohort])
+			    )
+			VAR CurrentActive = [Active Customers]
+			
+			RETURN 
+			IF(
+			    ISBLANK(CurrentActive), 
+			    BLANK(), 
+			    DIVIDE(CurrentActive, InitialCohortSize)
+			)
+			```
+		lineageTag: 98e1f232-3458-424b-b03b-669f39b96251
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Dashboard Insight Summary' = ```
+			
+			"High churn detected in " & 
+			TOPN(1, VALUES('DimCustomer - DimCustomer csv'[Segment]), [Monthly Churn Rate], DESC) & 
+			". Lending products show highest R12M growth at " & 
+			FORMAT([YoY Revenue Growth], "Percent") & "."
+			```
+		lineageTag: a0c0ecf4-62bf-4045-bb9a-ca1a3aa92694
+
+	measure 'Revenue Variance vs LY' = ```
+			
+			VAR CurrentYear = [Total Net Revenue]
+			VAR LastYear = CALCULATE([Total Net Revenue], SAMEPERIODLASTYEAR('DimDate - DimDate csv'[FullDate]))
+			RETURN 
+			IF(ISBLANK(LastYear), BLANK(), CurrentYear - LastYear)
+			```
+		lineageTag: 7cbf118d-4519-4601-bacf-0e47367b9139
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Column
+		formatString: 0
+		lineageTag: 09a0d7c0-bacb-41c1-809e-20f00ce03825
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Table = calculated
+		mode: import
+		source = TABLEOF()
+
+	annotation PBI_Id = a7804b2e00cb43089484a484c8991b66
+

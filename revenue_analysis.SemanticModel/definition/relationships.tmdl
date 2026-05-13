@@ -1,0 +1,41 @@
+relationship 3d77f626-8685-4625-80ac-b5b6a863b09e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'DimCustomer - DimCustomer csv'.RowEffectiveDate
+	toColumn: LocalDateTable_adbb112b-8761-4322-be3e-7271cd0deee4.Date
+
+relationship 6dcf4692-a740-48d0-937a-013d4e216d03
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'DimCustomer - DimCustomer csv'.RowExpireDate
+	toColumn: LocalDateTable_c91c71a1-9b74-4406-8bd7-0f1a5708f734.Date
+
+relationship 2b4b9094-94ac-4ba4-a6f8-7ae098b8eb75
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'DimDate - DimDate csv'.FullDate
+	toColumn: LocalDateTable_2b47eadf-65c6-4b3c-ad45-dfa1fdf509a4.Date
+
+relationship 377fbf4a-c9f5-4aa6-9198-1672ebf0c498
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'DimProduct - DimProduct csv'.LaunchDate
+	toColumn: LocalDateTable_63cb1c71-24f7-4a11-973f-b4ca2534f00a.Date
+
+relationship AutoDetected_797d23de-e78f-49b6-bbf1-168f25e4a785
+	fromColumn: 'FactRevenue - FactRevenue csv'.ChannelKey
+	toColumn: 'DimChannel - DimChannel csv'.ChannelKey
+
+relationship AutoDetected_5a90ff6f-a86c-40e9-a3dc-da9266e436b2
+	fromColumn: 'FactRevenue - FactRevenue csv'.CustomerKey
+	toColumn: 'DimCustomer - DimCustomer csv'.CustomerKey
+
+relationship AutoDetected_43f03b76-52f4-419f-b998-c80378f98a78
+	fromColumn: 'FactRevenue - FactRevenue csv'.DateKey
+	toColumn: 'DimDate - DimDate csv'.DateKey
+
+relationship AutoDetected_1b4b44a4-b518-409d-8941-ee37bd59dfcf
+	fromColumn: 'FactRevenue - FactRevenue csv'.ProductKey
+	toColumn: 'DimProduct - DimProduct csv'.ProductKey
+
+relationship a60b69fc-3d19-4bb2-aa23-dcc3f72e8c4b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'DimCustomer - DimCustomer csv'.CustomerCohort
+	toColumn: LocalDateTable_56be0271-81fe-47fd-ba29-106ecb2a0d2c.Date
+

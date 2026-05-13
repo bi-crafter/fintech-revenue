@@ -1,0 +1,379 @@
+table 'FactRevenue - FactRevenue csv'
+	lineageTag: f818f894-ee82-47c3-81ea-67a5e1663802
+
+	measure 'Total Revenue' = SUM('FactRevenue - FactRevenue csv'[NetRevenue])
+		formatString: $#,##0.00
+		lineageTag: c9b1f630-6e91-4b02-bc95-b433d595137f
+
+	measure 'Total Gross Margin' = SUM('FactRevenue - FactRevenue csv'[GrossMarginAmount])
+		formatString: $#,##0.00
+		lineageTag: 3ffa40c5-6c4a-41f4-af84-d4aa4dc4f5d4
+
+	measure 'Gross Margin %' = DIVIDE([Total Gross Margin], SUM('FactRevenue - FactRevenue csv'[GrossRevenue]), 0)
+		formatString: 0.00%
+		lineageTag: db3b43c3-a2a8-4f74-ba39-89ce30d333fa
+
+	measure 'Total Transactions' = COUNTA('FactRevenue - FactRevenue csv'[TransactionID])
+		formatString: #,##0
+		lineageTag: 14ba79bb-978e-41e1-bbbd-66ab02cd5abe
+
+	measure 'Refund Rate %' = DIVIDE(SUM('FactRevenue - FactRevenue csv'[IsRefunded]), [Total Transactions], 0)
+		formatString: 0.00%
+		lineageTag: 6757e0da-67db-41b4-ab38-8a6027268730
+
+	measure 'First Transaction Rate %' = DIVIDE(SUM('FactRevenue - FactRevenue csv'[IsFirstTransaction]), [Total Transactions], 0)
+		formatString: 0.00%
+		lineageTag: 6b162734-532a-4ac5-a54f-ef87849d1a54
+
+	measure 'Avg Transaction Value' = DIVIDE([Total Revenue], [Total Transactions], 0)
+		formatString: $#,##0.00
+		lineageTag: 8d5e67e9-72c8-4964-b716-9b78c2f8363b
+
+	measure 'Total Discounts' = SUM('FactRevenue - FactRevenue csv'[DiscountAmount])
+		formatString: $#,##0.00
+		lineageTag: 9d14a2b1-87df-4667-b3f2-46c4bfb9ef5e
+
+	measure 'Discount %' = DIVIDE(SUM('FactRevenue - FactRevenue csv'[DiscountAmount]), SUM('FactRevenue - FactRevenue csv'[GrossRevenue]), 0)
+		formatString: 0.00%
+		lineageTag: f5072c88-9e80-4854-a0e3-ce44792f0d8c
+
+	measure 'Total CPA' = SUM('FactRevenue - FactRevenue csv'[CostPerAcquisition])
+		formatString: $#,##0.00
+		lineageTag: 3fc29303-5fae-4577-a275-921bbce03816
+
+	measure 'Revenue Per Customer' = DIVIDE([Total Revenue], COUNTA(DISTINCT('FactRevenue - FactRevenue csv'[CustomerKey])), 0)
+		formatString: $#,##0.00
+		lineageTag: 88d03e68-23b4-4388-b093-7b138d096740
+
+	measure 'Unique Customers' = COUNTA(DISTINCT('FactRevenue - FactRevenue csv'[CustomerKey]))
+		formatString: #,##0
+		lineageTag: ee0dfc5c-3b86-4a33-92c0-a96b8f566daf
+
+	measure '[_Customer Retention Rate]' =
+			VAR CurrentMonth = MAX('DimDate - DimDate csv'[YearMonth])
+			VAR PriorMonth = CurrentMonth - 1
+			VAR CustomersCurrentMonth = DISTINCTCOUNT(FILTER(ALL('FactRevenue - FactRevenue csv'), 'DimDate - DimDate csv'[YearMonth] = CurrentMonth))
+			VAR CustomersPriorMonth = DISTINCTCOUNT(FILTER(ALL('FactRevenue - FactRevenue csv'), 'DimDate - DimDate csv'[YearMonth] = PriorMonth))
+			RETURN
+			DIVIDE(CustomersCurrentMonth, CustomersCurrentMonth + (CustomersPriorMonth - CustomersCurrentMonth), 0)
+		lineageTag: 72297978-b5a9-417f-9d86-946afa7ac3ee
+
+	measure '[_Customers at Risk]' =
+			VAR RecencyThreshold = 60
+			VAR AtRiskCustomers = CALCULATE(
+			  DISTINCTCOUNT('FactRevenue - FactRevenue csv'[CustomerKey]),
+			  FILTER(
+			    VALUES('FactRevenue - FactRevenue csv'[CustomerKey]),
+			    DATEDIFF(
+			      MAX('DimDate - DimDate csv'[FullDate]),
+			      CALCULATE(MAX('DimDate - DimDate csv'[FullDate]), ALLEXCEPT('FactRevenue - FactRevenue csv', 'FactRevenue - FactRevenue csv'[CustomerKey])),
+			      DAY
+			    ) >= RecencyThreshold
+			  )
+			)
+			RETURN AtRiskCustomers
+		lineageTag: 9ed0d485-ba24-440b-a4d4-67b80935c6ad
+
+	measure '[_Revenue at Risk]' =
+			VAR RecencyThreshold = 60
+			VAR RevenueAtRisk = CALCULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  FILTER(
+			    ALL('FactRevenue - FactRevenue csv'),
+			    DATEDIFF(
+			      MAX('DimDate - DimDate csv'[FullDate]),
+			      'DimDate - DimDate csv'[FullDate],
+			      DAY
+			    ) >= RecencyThreshold
+			  )
+			)
+			RETURN RevenueAtRisk
+		lineageTag: 79725182-0814-462d-a5e2-1d412b8fc6be
+
+	measure '[_RFM Score]' =
+			VAR Recency = DATEDIFF(
+			  CALCULATE(
+			    MAX('DimDate - DimDate csv'[FullDate]),
+			    ALLEXCEPT('FactRevenue - FactRevenue csv', 'FactRevenue - FactRevenue csv'[CustomerKey])
+			  ),
+			  MAX('DimDate - DimDate csv'[FullDate]),
+			  DAY
+			)
+			VAR Frequency = DISTINCTCOUNT('FactRevenue - FactRevenue csv'[TransactionKey])
+			VAR Monetary = SUM('FactRevenue - FactRevenue csv'[NetRevenue])
+			RETURN
+			SWITCH(
+			  TRUE(),
+			  Recency <= 30 && Frequency >= 5 && Monetary > 1000, "Champions",
+			  Recency <= 60 && Frequency >= 3 && Monetary > 500, "Loyal",
+			  Recency <= 90 && Frequency >= 2, "At-Risk",
+			  Recency > 90, "Churned",
+			  "New"
+			)
+		lineageTag: ba6e5faa-69a2-4cae-a27c-128b998d0011
+
+	measure '[_Moving 12M Avg Revenue]' =
+			VAR LargeWindow = DATESINPERIOD(
+			  'DimDate - DimDate csv'[FullDate],
+			  MAX('DimDate - DimDate csv'[FullDate]),
+			  -12,
+			  MONTH
+			)
+			RETURN
+			CACULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  LargeWindow
+			)
+		lineageTag: 16a50cd7-5423-4dd9-a138-4d3b40d4c8ba
+
+	measure '[_YoY Growth %]' =
+			VAR CurrentMonthRevenue = CALCULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  MAX('DimDate - DimDate csv'[YearMonth])
+			)
+			VAR PriorYearMonthRevenue = CALCULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  DATEADD('DimDate - DimDate csv'[FullDate], -12, MONTH)
+			)
+			RETURN
+			DIVIDE(
+			  (CurrentMonthRevenue - PriorYearMonthRevenue),
+			  PriorYearMonthRevenue,
+			  0
+			)
+		lineageTag: fb5e6666-fe5c-45f4-95dd-c75e40ca0b6b
+
+	measure '[_Organic Growth Rate]' =
+			VAR ExcludeQ4Start = "2024-10-01"
+			VAR ExcludeQ4End = "2024-12-31"
+			VAR OrganicRevenue = CALCULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  FILTER(
+			    ALL('DimDate - DimDate csv'),
+			    NOT (MONTH('DimDate - DimDate csv'[FullDate]) IN {10, 11, 12})
+			  )
+			)
+			VAR PriorYearOrganicRevenue = CALCULATE(
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  DATEADD('DimDate - DimDate csv'[FullDate], -12, MONTH),
+			  FILTER(
+			    ALL('DimDate - DimDate csv'),
+			    NOT (MONTH('DimDate - DimDate csv'[FullDate]) IN {10, 11, 12})
+			  )
+			)
+			RETURN
+			DIVIDE(
+			  (OrganicRevenue - PriorYearOrganicRevenue),
+			  PriorYearOrganicRevenue,
+			  0
+			)
+		lineageTag: 900a5d6c-c4e3-46a4-a2b9-3b731784212d
+
+	measure '[_Seasonal Variance %]' =
+			VAR RawMonthRevenue = SUM('FactRevenue - FactRevenue csv'[NetRevenue])
+			VAR MA12 = [_Moving 12M Avg Revenue]
+			RETURN
+			DIVIDE(
+			  (RawMonthRevenue - MA12),
+			  MA12,
+			  0
+			)
+		lineageTag: e726cdb0-0efb-460b-9dbd-ea58e311dadc
+
+	measure '[_CAC Payback Months]' =
+			VAR AvgCPA = CALCULATE(
+			  AVERAGE('DimChannel - DimChannel csv'[CostPerAcquisition]),
+			  ALLEXCEPT('DimChannel - DimChannel csv', 'DimChannel - DimChannel csv'[ChannelKey])
+			)
+			VAR AvgMonthlyRevenue = DIVIDE(
+			  CALCULATE(
+			    SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			    DATESINPERIOD('DimDate - DimDate csv'[FullDate], MAX('DimDate - DimDate csv'[FullDate]), -12, MONTH)
+			  ),
+			  12
+			)
+			RETURN
+			DIVIDE(
+			  AvgCPA,
+			  AvgMonthlyRevenue,
+			  BLANK()
+			)
+		lineageTag: ec5f5a23-aa13-4095-b36e-1755fcb5e6f6
+
+	measure '[_Blended Margin %]' =
+			DIVIDE(
+			  SUM('FactRevenue - FactRevenue csv'[GrossMarginAmount]),
+			  SUM('FactRevenue - FactRevenue csv'[NetRevenue]),
+			  0
+			)
+		lineageTag: 95cc392d-8ffc-467f-9abf-20546f53435a
+
+	measure '[_Avg Discount %]' =
+			VAR RawMonthDiscount = DIVIDE(
+			  SUM('FactRevenue - FactRevenue csv'[DiscountAmount]),
+			  SUM('FactRevenue - FactRevenue csv'[GrossRevenue]),
+			  0
+			)
+			RETURN RawMonthDiscount
+		lineageTag: 9b1c04a0-6447-44e4-93de-e42d779bb1f7
+
+	column TransactionKey
+		dataType: int64
+		formatString: 0
+		lineageTag: eb5fc181-7343-42fb-bee2-57f4a3166e2f
+		summarizeBy: count
+		sourceColumn: TransactionKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 67880418-cb4d-46d2-b4ed-480be93289aa
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a5782fe-68bc-47d1-8f03-70f946cdf3fa
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 42603a4c-c18c-4a54-a7a0-c07e690e0ec1
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ChannelKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 26fce3ca-5614-4a2f-b2b2-99b085309446
+		summarizeBy: none
+		sourceColumn: ChannelKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionID
+		dataType: string
+		lineageTag: 4d2be153-99f2-453f-9f3a-4783cf9f29a8
+		summarizeBy: none
+		sourceColumn: TransactionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrossRevenue
+		dataType: double
+		formatString: "₹"\ #,0.00;#,0.00\ -"₹";"₹"\ #,0.00
+		lineageTag: 734e2c9e-599d-4db2-b4c5-1dd1b00362b6
+		summarizeBy: sum
+		sourceColumn: GrossRevenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"bn-IN"}
+
+	column DiscountAmount
+		dataType: double
+		lineageTag: 740faac5-6fec-4df5-a5a4-10f054d2486a
+		summarizeBy: sum
+		sourceColumn: DiscountAmount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DiscountPct
+		dataType: double
+		lineageTag: b1a96004-0a83-41ce-aaee-924db46a981e
+		summarizeBy: sum
+		sourceColumn: DiscountPct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column NetRevenue
+		dataType: double
+		formatString: "₹"\ #,0.00;#,0.00\ -"₹";"₹"\ #,0.00
+		lineageTag: 3884ceac-bb78-49f2-8dfe-dd7aa286ae8a
+		summarizeBy: sum
+		sourceColumn: NetRevenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"bn-IN"}
+
+	column GrossMarginAmount
+		dataType: double
+		formatString: "₹"\ #,0.00;#,0.00\ -"₹";"₹"\ #,0.00
+		lineageTag: 370b0e3a-8548-4c54-a5b0-ef0d60c6bd76
+		summarizeBy: sum
+		sourceColumn: GrossMarginAmount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"bn-IN"}
+
+	column CostPerAcquisition
+		dataType: double
+		lineageTag: 30bfea60-8623-434b-9a07-294b5d4ac08e
+		summarizeBy: sum
+		sourceColumn: CostPerAcquisition
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column IsRefunded
+		dataType: int64
+		formatString: 0
+		lineageTag: 7e42d96c-712a-489b-a636-b8c9302dd7df
+		summarizeBy: sum
+		sourceColumn: IsRefunded
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsFirstTransaction
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c8d0bdd-58a9-4434-8afd-444e9b4b1c2a
+		summarizeBy: sum
+		sourceColumn: IsFirstTransaction
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Months Since Joining' = ```
+			
+			DATEDIFF(
+			    RELATED('DimCustomer - DimCustomer csv'[RowEffectiveDate]), 
+			    RELATED('DimDate - DimDate csv'[FullDate]), 
+			    MONTH
+			)
+			```
+		formatString: 0
+		lineageTag: 0979a174-bd8a-4496-9cb7-faad72ad36f3
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'FactRevenue - FactRevenue csv' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\My Drive\Fintech Star Schema\FactRevenue - FactRevenue.csv.csv"),[Delimiter=",", Columns=14, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"TransactionKey", Int64.Type}, {"DateKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"ProductKey", Int64.Type}, {"ChannelKey", Int64.Type}, {"TransactionID", type text}, {"GrossRevenue", type number}, {"DiscountAmount", type number}, {"DiscountPct", type number}, {"NetRevenue", type number}, {"GrossMarginAmount", type number}, {"CostPerAcquisition", type number}, {"IsRefunded", Int64.Type}, {"IsFirstTransaction", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

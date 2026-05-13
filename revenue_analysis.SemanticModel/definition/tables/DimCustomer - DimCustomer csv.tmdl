@@ -1,0 +1,191 @@
+table 'DimCustomer - DimCustomer csv'
+	lineageTag: 6df164e6-192b-4d6a-a1e2-6c661712a43c
+
+	column CustomerKey
+		dataType: int64
+		formatString: 0
+		lineageTag: c4e3a8eb-9cf8-4886-8b00-bd7570a29465
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: string
+		lineageTag: 58e13bdf-1ebd-4c7f-8a6e-3c802744bd3e
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column FirstName
+		dataType: string
+		lineageTag: 8c8ef143-c312-4a3a-99aa-27d5e1022df5
+		summarizeBy: none
+		sourceColumn: FirstName
+
+		annotation SummarizationSetBy = Automatic
+
+	column LastName
+		dataType: string
+		lineageTag: 1b032a99-fd44-47b8-9124-d3ed909de891
+		summarizeBy: none
+		sourceColumn: LastName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: 8e75f5d6-638f-443e-9ac9-b28cd74813b8
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: f9d83385-399f-4628-a31a-95939ced8754
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: ebb0665f-73f7-43d9-a45d-a742c8f26d5b
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 9cb05de1-323d-42d2-ae9b-e36619a81966
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 70612706-dea5-46e8-9d26-49c44bb34a07
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column AcquisitionChannel
+		dataType: string
+		lineageTag: d835f226-50ac-4d82-b497-5ba58c520d36
+		summarizeBy: none
+		sourceColumn: AcquisitionChannel
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLTVBand
+		dataType: string
+		lineageTag: d19864fb-ea70-466a-b17a-fc79844c4d19
+		summarizeBy: none
+		sourceColumn: CLTVBand
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreditScore
+		dataType: int64
+		formatString: 0
+		lineageTag: 844a896e-0d7f-4d3d-8791-d7e24ac1f132
+		summarizeBy: sum
+		sourceColumn: CreditScore
+
+		annotation SummarizationSetBy = Automatic
+
+	column AnnualIncome
+		dataType: int64
+		formatString: 0
+		lineageTag: e7851059-f83f-4029-ba97-61fcbb9bd370
+		summarizeBy: sum
+		sourceColumn: AnnualIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column RowEffectiveDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e61c9e4a-687b-4785-9ad7-31bca3804440
+		summarizeBy: none
+		sourceColumn: RowEffectiveDate
+
+		variation Variation
+			isDefault
+			relationship: 3d77f626-8685-4625-80ac-b5b6a863b09e
+			defaultHierarchy: LocalDateTable_adbb112b-8761-4322-be3e-7271cd0deee4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column RowExpireDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f512b242-a6cb-48f9-aead-a106e239947a
+		summarizeBy: none
+		sourceColumn: RowExpireDate
+
+		variation Variation
+			isDefault
+			relationship: 6dcf4692-a740-48d0-937a-013d4e216d03
+			defaultHierarchy: LocalDateTable_c91c71a1-9b74-4406-8bd7-0f1a5708f734.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column IsCurrent
+		dataType: int64
+		formatString: 0
+		lineageTag: 25b03079-97b9-4918-b77b-704378f68dd4
+		summarizeBy: sum
+		sourceColumn: IsCurrent
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerCohort = STARTOFYEAR('DimCustomer - DimCustomer csv'[RowEffectiveDate])
+		formatString: General Date
+		lineageTag: 1a43001c-1d49-4e59-ac04-8a4b3a82a8c4
+		summarizeBy: none
+
+		variation Variation
+			isDefault
+			relationship: a60b69fc-3d19-4bb2-aa23-dcc3f72e8c4b
+			defaultHierarchy: LocalDateTable_56be0271-81fe-47fd-ba29-106ecb2a0d2c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Customer Geography'
+		lineageTag: 5ce2cfd7-29d1-456b-9463-5f2735848c16
+
+		level Country
+			lineageTag: 2cd429f0-2f6b-4051-b933-fde68712c10d
+			column: Country
+
+		level State
+			lineageTag: 1faff0bc-1864-4a1e-b005-b862d867d4f6
+			column: State
+
+		level City
+			lineageTag: 54e3a021-ada3-443c-a879-e1e96888296f
+			column: City
+
+	partition 'DimCustomer - DimCustomer csv' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\My Drive\Fintech Star Schema\DimCustomer - DimCustomer.csv.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CustomerKey", Int64.Type}, {"CustomerID", type text}, {"FirstName", type text}, {"LastName", type text}, {"Email", type text}, {"Phone", type text}, {"Company", type text}, {"City", type text}, {"State", type text}, {"Country", type text}, {"PostalCode", Int64.Type}, {"Segment", type text}, {"AcquisitionChannel", type text}, {"CLTVBand", type text}, {"CreditScore", Int64.Type}, {"AnnualIncome", Int64.Type}, {"RowEffectiveDate", type date}, {"RowExpireDate", type date}, {"IsCurrent", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Phone", "Company", "PostalCode"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

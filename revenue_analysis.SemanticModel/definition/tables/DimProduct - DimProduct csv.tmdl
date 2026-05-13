@@ -1,0 +1,114 @@
+table 'DimProduct - DimProduct csv'
+	lineageTag: a49d246e-9d29-4b58-a9ba-9147ee4205e6
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 091b8b55-6cbe-4763-8618-0fa970e99b7c
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductID
+		dataType: string
+		lineageTag: e2fa8278-bee1-4801-ab87-d620a5d25b20
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: d85120dd-002a-4065-a45e-17a4b6c74cd7
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCategory
+		dataType: string
+		lineageTag: 23c55912-fe67-436a-a9bd-dad21f9e0029
+		summarizeBy: none
+		sourceColumn: ProductCategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductTier
+		dataType: string
+		lineageTag: 4b00b905-9441-496a-85b2-a380b74ad9af
+		summarizeBy: none
+		sourceColumn: ProductTier
+
+		annotation SummarizationSetBy = Automatic
+
+	column RevenueStream
+		dataType: string
+		lineageTag: 89f7b423-622d-4184-bc0c-499327903d90
+		summarizeBy: none
+		sourceColumn: RevenueStream
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrossMarginPct
+		dataType: double
+		lineageTag: 9509e81e-d982-4a51-9e8b-3fdd75d2ace8
+		summarizeBy: sum
+		sourceColumn: GrossMarginPct
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LaunchDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a51a2d2f-cbc8-48d9-9cc5-e4121d58b8cc
+		summarizeBy: none
+		sourceColumn: LaunchDate
+
+		variation Variation
+			isDefault
+			relationship: 377fbf4a-c9f5-4aa6-9198-1672ebf0c498
+			defaultHierarchy: LocalDateTable_63cb1c71-24f7-4a11-973f-b4ca2534f00a.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column IsActive
+		dataType: int64
+		formatString: 0
+		lineageTag: e1496adc-855e-4490-974d-839ca1de285b
+		summarizeBy: sum
+		sourceColumn: IsActive
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Product Hierarchy'
+		lineageTag: f1159e79-3647-432d-8795-0085c61f011a
+
+		level Category
+			lineageTag: 19c51878-bcd2-47fb-ab67-e619bbafbf64
+			column: ProductCategory
+
+		level Tier
+			lineageTag: b0d1cc4a-4ab3-41e5-bda5-58e71c171581
+			column: ProductTier
+
+		level Product
+			lineageTag: 55beeefb-64cb-46e8-94e8-e2e5f681bce5
+			column: ProductName
+
+	partition 'DimProduct - DimProduct csv' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\My Drive\Fintech Star Schema\DimProduct - DimProduct.csv.csv"),[Delimiter=",", Columns=9, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductKey", Int64.Type}, {"ProductID", type text}, {"ProductName", type text}, {"ProductCategory", type text}, {"ProductTier", type text}, {"RevenueStream", type text}, {"GrossMarginPct", type number}, {"LaunchDate", type date}, {"IsActive", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

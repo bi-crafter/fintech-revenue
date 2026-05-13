@@ -1,0 +1,68 @@
+table 'DimChannel - DimChannel csv'
+	lineageTag: 29a664d6-1464-4462-ad7f-4a9fe32e0ecd
+
+	column ChannelKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ec8b4062-6eb1-4946-928c-45683a76e921
+		summarizeBy: none
+		sourceColumn: ChannelKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column ChannelName
+		dataType: string
+		lineageTag: 88a187c4-c52d-4a33-93af-d7687f5c0398
+		summarizeBy: none
+		sourceColumn: ChannelName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ChannelType
+		dataType: string
+		lineageTag: 60d97664-9fc8-45aa-af60-bd573258a4ad
+		summarizeBy: none
+		sourceColumn: ChannelType
+
+		annotation SummarizationSetBy = Automatic
+
+	column CostPerAcquisition
+		dataType: double
+		lineageTag: 7991e047-974d-4a74-a874-34e29c55dc8d
+		summarizeBy: none
+		sourceColumn: CostPerAcquisition
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column IsOwnedMedia
+		dataType: int64
+		formatString: 0
+		lineageTag: 84f49303-8aa1-4b77-acf3-07eb1cd21a26
+		summarizeBy: none
+		sourceColumn: IsOwnedMedia
+
+		annotation SummarizationSetBy = Automatic
+
+	column DigitalFlag
+		dataType: int64
+		formatString: 0
+		lineageTag: d66247cd-4192-4f46-b190-2cb5216e3478
+		summarizeBy: none
+		sourceColumn: DigitalFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'DimChannel - DimChannel csv' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\My Drive\Fintech Star Schema\DimChannel - DimChannel.csv.csv"),[Delimiter=",", Columns=6, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ChannelKey", Int64.Type}, {"ChannelName", type text}, {"ChannelType", type text}, {"CostPerAcquisition", type number}, {"IsOwnedMedia", Int64.Type}, {"DigitalFlag", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

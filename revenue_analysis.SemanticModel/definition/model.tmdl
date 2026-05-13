@@ -1,0 +1,29 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DimChannel - DimChannel csv","DimCustomer - DimCustomer csv","DimProduct - DimProduct csv","DimDate - DimDate csv","FactRevenue - FactRevenue csv"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table 'DimChannel - DimChannel csv'
+ref table 'DimCustomer - DimCustomer csv'
+ref table DateTableTemplate_48930825-f917-4bef-bee2-33a19f4f2f00
+ref table LocalDateTable_adbb112b-8761-4322-be3e-7271cd0deee4
+ref table LocalDateTable_c91c71a1-9b74-4406-8bd7-0f1a5708f734
+ref table 'DimDate - DimDate csv'
+ref table LocalDateTable_2b47eadf-65c6-4b3c-ad45-dfa1fdf509a4
+ref table 'DimProduct - DimProduct csv'
+ref table LocalDateTable_63cb1c71-24f7-4a11-973f-b4ca2534f00a
+ref table 'FactRevenue - FactRevenue csv'
+ref table Table
+ref table LocalDateTable_56be0271-81fe-47fd-ba29-106ecb2a0d2c
+
+ref cultureInfo en-US
+

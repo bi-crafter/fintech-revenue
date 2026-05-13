@@ -1,0 +1,34 @@
+# Power BI Cache & Local Settings
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/                        # Power BI cache directory
+
+# Local Workspace Settings
+.vscode/
+*.code-workspace
+
+# OS-specific
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Credentials & Sensitive Data
+.env
+.env.local
+*.credentials
+
+# Backup files
+*.bak
+~$*.xlsx
